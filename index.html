@@ -41,7 +41,7 @@ h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; text-align: center; }
 <div id="app-wrapper">
 <div id="quiz-container">
 <div id="start-screen">
-<img src="logo.png" alt="ロゴ" class="start-logo">
+<img src="logo.png" alt="ロゴ" class="start-logo" onerror="this.style.display='none'">
 <h1>関節の動き・筋肉学習アプリ</h1>
 <p class="subtitle">カラダかわる。ココロおどる。</p>
 <button class="btn" onclick="startQuiz()">学習をスタートする</button>
@@ -66,7 +66,7 @@ h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; text-align: center; }
 </div>
 
 <div id="logo-container">
-<img src="logo.png" alt="ロゴ">
+<img src="logo.png" alt="ロゴ" onerror="this.style.display='none'">
 </div>
 </div>
 
@@ -76,60 +76,51 @@ h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; text-align: center; }
 const quizData = [
 { question: "肩関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["広背筋", "三角筋(前部)", "大胸筋(上部)", "棘上筋"], answer: "三角筋(前部)" },
 { question: "肘関節の「伸展」において、貢献度1位の筋肉は？", choices: ["上腕二頭筋", "上腕筋", "上腕三頭筋", "肘筋"], answer: "上腕三頭筋" },
-{ question: "股関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["大殿筋", "ハムストリングス", "中殿筋", "腸腰筋"], answer: "腸腰筋" },
+{ question: "股 কোম関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["大殿筋", "ハムストリングス", "中殿筋", "腸腰筋"], answer: "腸腰筋" },
 { question: "膝関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["ハムストリングス", "大腿四頭筋", "腓腹筋", "大殿筋"], answer: "ハムストリングス" },
 { question: "肩関節の「外転」において、貢献度2位の筋肉は？", choices: ["三角筋(中部)", "棘上筋", "大円筋", "広背筋"], answer: "棘上筋" }
 ];
 
 let currentQuestionIndex = 0;
-let userAnswers = new Array(quizData.length).fill(null);
+let userAnswers = [];
 let isAnimating = false;
 
-const startScreen = document.getElementById("start-screen");
-const quizScreen = document.getElementById("quiz-screen");
-const resultScreen = document.getElementById("result-screen");
-const questionText = document.getElementById("question-text");
-const choicesContainer = document.getElementById("choices-container");
-const resultText = document.getElementById("result-text");
-const popup = document.getElementById("popup");
-const logoContainer = document.getElementById("logo-container");
-const prevBtn = document.getElementById("prev-btn");
-const nextBtn = document.getElementById("next-btn");
-
 function startQuiz() {
-startScreen.style.display = "none";
-quizScreen.style.display = "block";
-logoContainer.style.display = "block";
+document.getElementById("start-screen").style.display = "none";
+document.getElementById("quiz-screen").style.display = "block";
+document.getElementById("logo-container").style.display = "block";
 currentQuestionIndex = 0;
 userAnswers = new Array(quizData.length).fill(null);
+isAnimating = false;
 loadQuestion();
 }
 
 function loadQuestion() {
-isAnimating = false;
 const currentQuiz = quizData[currentQuestionIndex];
-questionText.textContent = "Q" + (currentQuestionIndex + 1) + ". " + currentQuiz.question;
+document.getElementById("question-text").textContent = "Q" + (currentQuestionIndex + 1) + ". " + currentQuiz.question;
+
+const choicesContainer = document.getElementById("choices-container");
 choicesContainer.innerHTML = "";
 
-currentQuiz.choices.forEach(choice => {
+currentQuiz.choices.forEach(function(choice) {
 const button = document.createElement("button");
 button.textContent = choice;
-button.classList.add("btn");
+button.className = "btn";
 
 if (userAnswers[currentQuestionIndex] === choice) {
   button.classList.add(&quot;selected&quot;);
 }
 
-button.onclick = () =&gt; checkAnswer(choice);
+button.onclick = function() { checkAnswer(choice); };
 choicesContainer.appendChild(button);
 });
 
-prevBtn.disabled = currentQuestionIndex === 0;
+document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
 
 if (currentQuestionIndex === quizData.length - 1) {
-nextBtn.textContent = "結果を見る";
+document.getElementById("next-btn").textContent = "結果を見る";
 } else {
-nextBtn.textContent = "次の問題";
+document.getElementById("next-btn").textContent = "次の問題";
 }
 }
 
@@ -139,7 +130,9 @@ isAnimating = true;
 
 userAnswers[currentQuestionIndex] = selectedChoice;
 const currentQuiz = quizData[currentQuestionIndex];
-const isCorrect = selectedChoice === currentQuiz.answer;
+const isCorrect = (selectedChoice === currentQuiz.answer);
+
+const popup = document.getElementById("popup");
 
 if (isCorrect) {
 popup.innerHTML = "<div class='correct-text'>○ 正解！</div>";
@@ -150,7 +143,7 @@ popup.innerHTML = "<div class='incorrect-text'>× 不正解...</div><span class=
 popup.classList.add("show");
 loadQuestion();
 
-setTimeout(() => {
+setTimeout(function() {
 popup.classList.remove("show");
 if (currentQuestionIndex < quizData.length - 1) {
 currentQuestionIndex++;
@@ -158,6 +151,7 @@ loadQuestion();
 } else {
 showResult();
 }
+isAnimating = false;
 }, 1200);
 }
 
@@ -178,21 +172,22 @@ showResult();
 }
 
 function showResult() {
-quizScreen.style.display = "none";
-logoContainer.style.display = "none";
-resultScreen.style.display = "block";
+document.getElementById("quiz-screen").style.display = "none";
+document.getElementById("logo-container").style.display = "none";
+document.getElementById("result-screen").style.display = "block";
 
 let score = 0;
-userAnswers.forEach((ans, index) => {
+userAnswers.forEach(function(ans, index) {
 if (ans === quizData[index].answer) score++;
 });
 
-resultText.textContent = quizData.length + "問中 " + score + " 問正解です！";
+document.getElementById("result-text").textContent = quizData.length + "問中 " + score + " 問正解です！";
 }
 
 function resetQuiz() {
-resultScreen.style.display = "none";
-startScreen.style.display = "block";
+document.getElementById("result-screen").style.display = "none";
+document.getElementById("start-screen").style.display = "block";
+isAnimating = false;
 }
 </script>
 
