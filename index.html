@@ -6,27 +6,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>関節の動き・筋肉学習アプリ</title>
 <style>
-body { font-family: sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; text-align: center; }
-h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; }
-.subtitle { font-size: 14px; color: #666; margin-bottom: 20px; }
-#quiz-container { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto; position: relative; width: 100%; box-sizing: border-box; }
-.question { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+body { font-family: sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+#app-wrapper { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; text-align: center; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 20px; text-align: center; }
+#quiz-container { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box; position: relative; }
+.question { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; }
 .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; font-size: 16px; background-color: #e2e8f0; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
 .btn:active { background-color: #cbd5e1; }
+.btn.selected { background-color: #bae6fd; border: 2px solid #0284c7; }
 
-#result-screen { display: none; }
-#quiz-screen { display: none; }
-#start-screen { display: block; }
+.nav-container { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+.nav-btn { flex: 1; padding: 12px; background-color: #0056b3; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: 0.2s; }
+.nav-btn:active { background-color: #004494; }
+.nav-btn:disabled { background-color: #cbd5e1; cursor: not-allowed; }
 
-/* ポップアップのスタイル */
-#popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; font-weight: bold; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; width: 80%; max-width: 300px; }
+#result-screen, #quiz-screen { display: none; text-align: center; }
+#start-screen { display: block; text-align: center; }
+
+#popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; font-weight: bold; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; width: 80%; max-width: 300px; text-align: center; }
 #popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 .correct-text { color: #10b981; }
 .incorrect-text { color: #ef4444; }
 .answer-text { font-size: 16px; color: #333; margin-top: 10px; display: block; font-weight: normal; }
 
-/* ロゴのスタイル */
-#logo-container { margin: 15px auto 0; text-align: center; max-width: 400px; }
+#logo-container { margin-top: 20px; text-align: center; width: 100%; display: none; }
 #logo-container img { max-width: 150px; height: auto; opacity: 0.8; }
 .start-logo { max-width: 200px; height: auto; margin-bottom: 20px; }
 </style>
@@ -34,7 +38,7 @@ h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; }
 </head>
 <body>
 
-<div>
+<div id="app-wrapper">
 <div id="quiz-container">
 <div id="start-screen">
 <img src="logo.png" alt="ロゴ" class="start-logo">
@@ -47,6 +51,11 @@ h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; }
   <h1>関節の動き・筋肉学習アプリ</h1>
   <div id="question-text" class="question"></div>
   <div id="choices-container"></div>
+  
+  <div class="nav-container">
+    <button id="prev-btn" class="nav-btn" onclick="goPrev()">前の問題</button>
+    <button id="next-btn" class="nav-btn" onclick="goNext()">次の問題</button>
+  </div>
 </div>
 
 <div id="result-screen">
@@ -56,7 +65,7 @@ h1 { font-size: 20px; color: #0056b3; margin-bottom: 10px; }
 </div>
 </div>
 
-<div id="logo-container" style="display: none;">
+<div id="logo-container">
 <img src="logo.png" alt="ロゴ">
 </div>
 </div>
@@ -73,7 +82,7 @@ const quizData = [
 ];
 
 let currentQuestionIndex = 0;
-let score = 0;
+let userAnswers = new Array(quizData.length).fill(null);
 let isAnimating = false;
 
 const startScreen = document.getElementById("start-screen");
@@ -84,13 +93,15 @@ const choicesContainer = document.getElementById("choices-container");
 const resultText = document.getElementById("result-text");
 const popup = document.getElementById("popup");
 const logoContainer = document.getElementById("logo-container");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
 
 function startQuiz() {
 startScreen.style.display = "none";
 quizScreen.style.display = "block";
 logoContainer.style.display = "block";
 currentQuestionIndex = 0;
-score = 0;
+userAnswers = new Array(quizData.length).fill(null);
 loadQuestion();
 }
 
@@ -104,42 +115,78 @@ currentQuiz.choices.forEach(choice => {
 const button = document.createElement("button");
 button.textContent = choice;
 button.classList.add("btn");
-button.onclick = () => checkAnswer(choice);
+
+if (userAnswers[currentQuestionIndex] === choice) {
+  button.classList.add(&quot;selected&quot;);
+}
+
+button.onclick = () =&gt; checkAnswer(choice);
 choicesContainer.appendChild(button);
 });
+
+prevBtn.disabled = currentQuestionIndex === 0;
+
+if (currentQuestionIndex === quizData.length - 1) {
+nextBtn.textContent = "結果を見る";
+} else {
+nextBtn.textContent = "次の問題";
+}
 }
 
 function checkAnswer(selectedChoice) {
 if (isAnimating) return;
 isAnimating = true;
 
+userAnswers[currentQuestionIndex] = selectedChoice;
 const currentQuiz = quizData[currentQuestionIndex];
 const isCorrect = selectedChoice === currentQuiz.answer;
 
 if (isCorrect) {
-score++;
 popup.innerHTML = "<div class='correct-text'>○ 正解！</div>";
 } else {
 popup.innerHTML = "<div class='incorrect-text'>× 不正解...</div><span class='answer-text'>正解は「" + currentQuiz.answer + "」</span>";
 }
 
 popup.classList.add("show");
+loadQuestion();
 
 setTimeout(() => {
 popup.classList.remove("show");
+if (currentQuestionIndex < quizData.length - 1) {
 currentQuestionIndex++;
-if (currentQuestionIndex < quizData.length) {
-setTimeout(loadQuestion, 300);
+loadQuestion();
 } else {
-setTimeout(showResult, 300);
+showResult();
 }
 }, 1200);
+}
+
+function goPrev() {
+if (isAnimating || currentQuestionIndex === 0) return;
+currentQuestionIndex--;
+loadQuestion();
+}
+
+function goNext() {
+if (isAnimating) return;
+if (currentQuestionIndex < quizData.length - 1) {
+currentQuestionIndex++;
+loadQuestion();
+} else {
+showResult();
+}
 }
 
 function showResult() {
 quizScreen.style.display = "none";
 logoContainer.style.display = "none";
 resultScreen.style.display = "block";
+
+let score = 0;
+userAnswers.forEach((ans, index) => {
+if (ans === quizData[index].answer) score++;
+});
+
 resultText.textContent = quizData.length + "問中 " + score + " 問正解です！";
 }
 
