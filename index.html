@@ -6,259 +6,246 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>関節の動き・筋肉学習アプリ</title>
 <style>
-body { font-family: sans-serif; background-color: #f0f9ff; color: #333; margin: 0; padding: 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+body { font-family: sans-serif; background-color: #f0f9ff; color: #333; margin: 0; padding: 20px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; min-height: 100vh; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
 #app-wrapper { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
 h1 { font-size: 20px; color: #12658D; margin-bottom: 10px; text-align: center; }
 .subtitle { font-size: 14px; color: #666; margin-bottom: 20px; text-align: center; font-weight: bold; }
 #muscle-img-wrapper { width: 100%; max-width: 400px; margin-bottom: 15px; display: none; }
-#muscle-img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: #fff; }
-#quiz-container { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box; touch-action: pan-y; }
-.question { font-size: 18px; font-weight: bold; margin-bottom: 20px; text-align: center; line-height: 1.4; color: #12658D; }
-.btn { display: block; width: 100%; padding: 15px; margin: 10px 0; font-size: 14px; background-color: #f1f5f9; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; box-sizing: border-box; text-align: left; line-height: 1.4; }
-.btn:active { background-color: #e2e8f0; }
-.btn.selected { background-color: #e6eff4; border: 2px solid #12658D; }
-.nav-container { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
-.nav-btn { flex: 1; padding: 12px; background-color: #12658D; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: 0.2s; }
-.nav-btn:active { background-color: #0b3d55; }
-.nav-btn:disabled { background-color: #88b2c6; cursor: not-allowed; }
-#result-screen, #quiz-screen, #logo-container { display: none; text-align: center; }
-#start-screen { display: block; text-align: center; }
-#popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(255,255,255,0.95); padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 24px; font-weight: bold; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 1000; width: 80%; max-width: 300px; text-align: center; }
-#popup.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-.correct-text { color: #12658D; }
-.incorrect-text { color: #ef4444; }
-.answer-text { font-size: 14px; color: #333; margin-top: 10px; display: block; font-weight: normal; line-height: 1.4; }
-#logo-container { margin-top: 20px; text-align: center; width: 100%; }
+#muscle-img { width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); background-color: #fff; pointer-events: none; }
+#quiz-container { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; box-sizing: border-box; min-height: 300px; display: flex; flex-direction: column; justify-content: center; }
+.question { font-size: 24px; font-weight: bold; margin-bottom: 20px; text-align: center; line-height: 1.4; color: #12658D; pointer-events: none; }
+#furigana-container { display: none; font-size: 16px; color: #888; margin-bottom: 10px; text-align: center; line-height: 1.2; pointer-events: none; }
+#answer-container { display: none; font-size: 28px; font-weight: bold; color: #ef4444; margin-bottom: 20px; text-align: center; line-height: 1.4; pointer-events: none; }
+.btn { display: block; width: 100%; padding: 15px; margin: 10px 0; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+.btn:active { opacity: 0.8; }
+#result-screen, #logo-container { display: none; text-align: center; }
+#start-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; }
+#quiz-screen { display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 250px; cursor: pointer; }
+.tap-guide { font-size: 13px; color: #aaa; margin-top: 30px; text-align: center; pointer-events: none; }
+#logo-container { margin-top: 20px; text-align: center; width: 100%; pointer-events: none; }
 #logo-container img { max-width: 150px; height: auto; opacity: 0.8; }
 .start-logo { max-width: 200px; height: auto; margin-bottom: 20px; }
-#progress-text { font-size: 14px; color: #666; text-align: right; margin-bottom: 10px; font-weight: bold; }
+#progress-text { font-size: 14px; color: #666; text-align: right; width: 100%; margin-bottom: 15px; font-weight: bold; pointer-events: none; }
 </style>
 </head>
 <body>
+
 <div id="app-wrapper">
+
 <div id="muscle-img-wrapper">
 <img id="muscle-img" src="" alt="動きの画像" onerror="this.style.display='none'">
 </div>
+
 <div id="quiz-container">
+
 <div id="start-screen">
 <img src="logo.png" alt="ロゴ" class="start-logo" id="start-logo-img">
 <h1>関節の動き・筋肉学習アプリ</h1>
 <p class="subtitle">「続かない運動」を「心地よい習慣へ」。</p>
-<button id="start-btn" class="btn" style="text-align: center; font-size: 16px; background-color: #12658D; color: white;">学習をスタートする</button>
+<button id="start-btn" class="btn" style="text-align: center; background-color: #12658D; color: white;">学習をスタートする</button>
 </div>
+
 <div id="quiz-screen">
 <div id="progress-text"></div>
 <div id="question-text" class="question"></div>
-<div id="choices-container"></div>
-<div class="nav-container">
-<button id="prev-btn" class="nav-btn">前の問題</button>
-<button id="next-btn" class="nav-btn">次の問題</button>
+<div id="furigana-container"></div>
+<div id="answer-container"></div>
+<div class="tap-guide">画面のどこかをタップ、または左右にスワイプ</div>
 </div>
-</div>
+
 <div id="result-screen">
-<h1>学習完了</h1>
-<div id="result-text" style="font-size: 20px; font-weight: bold; margin-top: 20px; color: #12658D;"></div>
-<button id="reset-btn" class="btn" style="margin-top: 30px; text-align: center; font-size: 16px; background-color: #12658D; color: white;">最初からやり直す</button>
+<h1>1周完了しました！</h1>
+<div style="font-size: 16px; margin-top: 20px; color: #333; line-height: 1.6;">
+反復学習で知識を定着させましょう。
+
+
+お疲れ様でした！
 </div>
+<button id="reset-btn" class="btn" style="margin-top: 30px; text-align: center; background-color: #12658D; color: white;">最初からやり直す</button>
+</div>
+
 </div>
 <div id="logo-container">
 <img src="logo.png" alt="ロゴ" id="footer-logo-img">
 </div>
 </div>
-<div id="popup"></div>
+
 <script>
 document.getElementById('start-logo-img').addEventListener('error', function() { this.style.display='none'; });
 document.getElementById('footer-logo-img').addEventListener('error', function() { this.style.display='none'; });
 
 const quizData = [
-{ question: "肩関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["広背筋", "三角筋(前部)", "大胸筋(上部)", "大円筋"], answer: "三角筋(前部)", image: "shoulder_flexion.png" },
-{ question: "肩関節の「屈曲」において、貢献度2位の筋肉は？", choices: ["大胸筋(上部)", "小円筋", "大円筋", "棘下筋"], answer: "大胸筋(上部)", image: "shoulder_flexion.png" },
-{ question: "肩関節の「伸展」において、貢献度1位の筋肉は？", choices: ["大円筋", "広背筋", "三角筋(後部)", "肩甲下筋"], answer: "広背筋", image: "shoulder_extension.png" },
-{ question: "肩関節の「伸展」において、貢献度2位の筋肉は？", choices: ["大円筋", "小円筋", "棘下筋", "三角筋(後部)"], answer: "大円筋", image: "shoulder_extension.png" },
-{ question: "肩関節の「外転」において、貢献度1位の筋肉は？", choices: ["棘上筋", "三角筋(中部)", "大胸筋", "広背筋"], answer: "三角筋(中部)", image: "shoulder_abduction.png" },
-{ question: "肩関節の「外転」において、貢献度2位の筋肉は？", choices: ["小円筋", "肩甲下筋", "棘上筋", "大円筋"], answer: "棘上筋", image: "shoulder_abduction.png" },
-{ question: "肩関節の「内転」において、貢献度1位の筋肉は？", choices: ["大胸筋(下部)", "広背筋", "小円筋", "大円筋"], answer: "広背筋", image: "shoulder_adduction.png" },
-{ question: "肩関節の「内転」において、貢献度2位の筋肉は？", choices: ["大胸筋(下部)", "中殿筋", "三角筋(前部)", "棘下筋"], answer: "大胸筋(下部)", image: "shoulder_adduction.png" },
-{ question: "肩関節の「外旋」において、貢献度1位の筋肉は？", choices: ["肩甲下筋", "棘下筋", "小円筋", "大胸筋"], answer: "棘下筋", image: "shoulder_er.png" },
-{ question: "肩関節の「外旋」において、貢献度2位の筋肉は？", choices: ["小円筋", "大円筋", "広背筋", "三角筋(後部)"], answer: "小円筋", image: "shoulder_er.png" },
-{ question: "肩関節の「内旋」において、貢献度1位の筋肉は？", choices: ["広背筋", "肩甲下筋", "大円筋", "大胸筋"], answer: "肩甲下筋", image: "shoulder_ir.png" },
-{ question: "肩関節の「内旋」において、貢献度2位の筋肉は？", choices: ["大胸筋", "大円筋", "小円筋", "棘下筋"], answer: "大胸筋", image: "shoulder_ir.png" },
-{ question: "肩関節の「水平内転」において、貢献度1位の筋肉は？", choices: ["大胸筋", "三角筋(前部)", "広背筋", "小胸筋"], answer: "大胸筋", image: "shoulder_horizontal_adduction.png" },
-{ question: "肩関節の「水平内転」において、貢献度2位の筋肉は？", choices: ["大胸筋", "三角筋(前部)", "棘上筋", "肩甲下筋"], answer: "三角筋(前部)", image: "shoulder_horizontal_adduction.png" },
-{ question: "肩関節の「水平外転」において、貢献度1位の筋肉は？", choices: ["大胸筋", "広背筋", "三角筋(中部)", "棘上筋"], answer: "広背筋", image: "shoulder_horizontal_abduction.png" },
-{ question: "肩関節の「水平外転」において、貢献度2位の筋肉は？", choices: ["三角筋(後部)", "小円筋", "肩甲下筋", "棘下筋"], answer: "三角筋(後部)", image: "shoulder_horizontal_abduction.png" },
-{ question: "肩甲骨の「挙上」において、貢献度1位の筋肉は？", choices: ["肩甲挙筋", "僧帽筋(上部)", "小胸筋", "前鋸筋"], answer: "僧帽筋(上部)", image: "scapula_elevation.png" },
-{ question: "肩甲骨の「挙上」において、貢献度2位の筋肉は？", choices: ["肩甲挙筋", "前鋸筋", "僧帽筋(下部)", "小菱形筋"], answer: "肩甲挙筋", image: "scapula_elevation.png" },
-{ question: "肩甲骨の「下制」において、貢献度1位の筋肉は？", choices: ["僧帽筋(上部)", "僧帽筋(下部)", "小胸筋", "前鋸筋"], answer: "僧帽筋(下部)", image: "scapula_depression.png" },
-{ question: "肩甲骨の「下制」において、貢献度2位の筋肉は？", choices: ["小胸筋", "肩甲挙筋", "僧帽筋(中部)", "前鋸筋"], answer: "小胸筋", image: "scapula_depression.png" },
-{ question: "肩甲骨の「内転」において、貢献度1位の筋肉は？", choices: ["僧帽筋(中部)", "大菱形筋", "前鋸筋", "小胸筋"], answer: "僧帽筋(中部)", image: "scapula_adduction.png" },
-{ question: "肩甲骨の「内転」において、貢献度2位の筋肉は？", choices: ["僧帽筋(中部)", "大菱形筋", "前鋸筋", "肩甲挙筋"], answer: "大菱形筋", image: "scapula_adduction.png" },
-{ question: "肩甲骨の「外転」において、貢献度1位の筋肉は？", choices: ["小胸筋", "前鋸筋", "僧帽筋(中部)", "肩甲挙筋"], answer: "前鋸筋", image: "scapula_abduction.png" },
-{ question: "肩甲骨の「外転」において、貢献度2位の筋肉は？", choices: ["小胸筋", "前鋸筋", "大菱形筋", "僧帽筋(上部)"], answer: "小胸筋", image: "scapula_abduction.png" },
-{ question: "肩甲骨の「上方回旋」において、貢献度1位の筋肉は？", choices: ["僧帽筋(上部)", "前鋸筋", "大菱形筋", "小胸筋"], answer: "僧帽筋(上部)", image: "scapula_upward_rotation.png" },
-{ question: "肩甲骨の「上方回旋」において、貢献度2位の筋肉は？", choices: ["前鋸筋", "僧帽筋(中部)", "僧帽筋(下部)", "肩甲挙筋"], answer: "前鋸筋", image: "scapula_upward_rotation.png" },
-{ question: "肩甲骨の「下方回旋」において、貢献度1位の筋肉は？", choices: ["大菱形筋", "小菱形筋", "前鋸筋", "僧帽筋(上部)"], answer: "大菱形筋", image: "scapula_downward_rotation.png" },
-{ question: "肩甲骨の「下方回旋」において、貢献度2位の筋肉は？", choices: ["小菱形筋", "前鋸筋", "僧帽筋(下部)", "肩甲挙筋"], answer: "小菱形筋", image: "scapula_downward_rotation.png" },
-{ question: "肘関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["上腕二頭筋", "上腕筋", "腕橈骨筋", "円回内筋"], answer: "上腕二頭筋", image: "elbow_flexion.png" },
-{ question: "肘関節の「屈曲」において、貢献度2位の筋肉は？", choices: ["上腕二頭筋", "上腕筋", "腕橈骨筋", "上腕三頭筋"], answer: "上腕筋", image: "elbow_flexion.png" },
-{ question: "肘関節の「伸展」において、貢献度1位の筋肉は？", choices: ["上腕二頭筋", "上腕三頭筋", "肘筋", "回外筋"], answer: "上腕三頭筋", image: "elbow_extension.png" },
-{ question: "肘関節の「伸展」において、貢献度2位の筋肉は？", choices: ["肘筋", "上腕筋", "円回内筋", "上腕三頭筋"], answer: "肘筋", image: "elbow_extension.png" },
-{ question: "前腕の「回外」において、貢献度1位の筋肉は？", choices: ["回外筋", "上腕二頭筋", "円回内筋", "上腕筋"], answer: "上腕二頭筋", image: "forearm_supination.png" },
-{ question: "前腕の「回外」において、貢献度2位の筋肉は？", choices: ["回外筋", "上腕二頭筋", "方形回内筋", "肘筋"], answer: "回外筋", image: "forearm_supination.png" },
-{ question: "前腕の「回内」において、貢献度1位の筋肉は？", choices: ["方形回内筋", "円回内筋", "回外筋", "上腕二頭筋"], answer: "円回内筋", image: "forearm_pronation.png" },
-{ question: "前腕の「回内」において、貢献度2位の筋肉は？", choices: ["方形回内筋", "円回内筋", "上腕筋", "腕橈骨筋"], answer: "方形回内筋", image: "forearm_pronation.png" },
-{ question: "股関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["大腿直筋", "腸腰筋", "大殿筋", "中殿筋"], answer: "腸腰筋", image: "hip_flexion.png" },
-{ question: "股関節の「屈曲」において、貢献度2位の筋肉は？", choices: ["大腿直筋", "内転筋群", "小殿筋(前部)", "縫工筋"], answer: "大腿直筋", image: "hip_flexion.png" },
-{ question: "股関節の「伸展」において、貢献度1位の筋肉は？", choices: ["ハムストリングス", "大殿筋", "中殿筋", "腸腰筋"], answer: "大殿筋", image: "hip_extension.png" },
-{ question: "股関節の「伸展」において、貢献度2位の筋肉は？", choices: ["ハムストリングス", "大殿筋", "内転筋群", "中殿筋"], answer: "ハムストリングス", image: "hip_extension.png" },
-{ question: "股関節の「外転」において、貢献度1位の筋肉は？", choices: ["大殿筋(上部)", "中殿筋", "小殿筋", "内転筋群"], answer: "中殿筋", image: "hip_abduction.png" },
-{ question: "股関節の「外転」において、貢献度2位の筋肉は？", choices: ["大殿筋(上部)", "中殿筋", "縫工筋", "大腿直筋"], answer: "大殿筋(上部)", image: "hip_abduction.png" },
-{ question: "股関節の「内転」において、貢献度1位の筋肉は？", choices: ["中殿筋", "内転筋群", "大殿筋", "腸腰筋"], answer: "内転筋群", image: "hip_adduction.png" },
-{ question: "股関節の「内転」において、貢献度2位の筋肉は？", choices: ["内転筋群", "大殿筋", "ハムストリングス", "中殿筋"], answer: "大殿筋", image: "hip_adduction.png" },
-{ question: "股関節の「外旋」において、貢献度1位の筋肉は？", choices: ["大腿方形筋", "大殿筋", "中殿筋", "小殿筋"], answer: "大殿筋", image: "hip_er.png" },
-{ question: "股関節の「外旋」において、貢献度2位の筋肉は？", choices: ["大腿方形筋", "大殿筋", "内転筋群", "中殿筋"], answer: "大腿方形筋", image: "hip_er.png" },
-{ question: "股関節の「内旋」において、貢献度1位の筋肉は？", choices: ["小殿筋(前部)", "中殿筋(前部)", "大腿方形筋", "内転筋群"], answer: "中殿筋(前部)", image: "hip_ir.png" },
-{ question: "股関節の「内旋」において、貢献度2位の筋肉は？", choices: ["小殿筋(前部)", "中殿筋(前部)", "内転筋群", "大腿直筋"], answer: "小殿筋(前部)", image: "hip_ir.png" },
-{ question: "膝関節の「屈曲」において、貢献度1位の筋肉は？", choices: ["大腿四頭筋", "ハムストリングス", "腓腹筋", "大殿筋"], answer: "ハムストリングス", image: "knee_flexion.png" },
-{ question: "膝関節の「屈曲」において、貢献度2位の筋肉は？", choices: ["腓腹筋", "ハムストリングス", "大腿直筋", "ヒラメ筋"], answer: "腓腹筋", image: "knee_flexion.png" },
-{ question: "膝関節の「伸展」において、貢献度1位の筋肉は？", choices: ["ハムストリングス", "大腿四頭筋", "腓腹筋", "大殿筋"], answer: "大腿四頭筋", image: "knee_extension.png" },
-{ question: "体幹の「屈曲」において、貢献度1位の筋肉は？", choices: ["外・内腹斜筋", "腹直筋", "脊柱起立筋", "腰方形筋"], answer: "腹直筋", image: "thoracolumbar_flexion.png" },
-{ question: "体幹の「屈曲」において、貢献度2位の筋肉は？", choices: ["外・内腹斜筋", "腹直筋", "腰方形筋", "脊柱起立筋"], answer: "外・内腹斜筋", image: "thoracolumbar_flexion.png" },
-{ question: "体幹の「伸展」において、貢献度1位の筋肉は？", choices: ["腰方形筋", "脊柱起立筋", "腹直筋", "外・内腹斜筋"], answer: "脊柱起立筋", image: "thoracolumbar_extension.png" },
-{ question: "体幹の「伸展」において、貢献度2位の筋肉は？", choices: ["腰方形筋", "脊柱起立筋", "内腹斜筋", "広背筋"], answer: "腰方形筋", image: "thoracolumbar_extension.png" },
-{ question: "体幹の「側屈」において、貢献度1位の筋肉は？", choices: ["脊柱起立筋", "外・内腹斜筋", "腹直筋", "腰方形筋"], answer: "外・内腹斜筋", image: "thoracolumbar_lateral.png" },
-{ question: "体幹の「側屈」において、貢献度2位の筋肉は？", choices: ["腰方形筋", "外腹斜筋", "脊柱起立筋", "腹直筋"], answer: "腰方形筋", image: "thoracolumbar_lateral.png" },
-{ question: "体幹の「回旋」において、貢献度1位の筋肉は？", choices: ["脊柱起立筋", "内、外腹斜筋", "腰方形筋", "腹直筋"], answer: "内、外腹斜筋", image: "thoracolumbar_rotation.png" },
-{ question: "体幹の「回旋」において、貢献度2位の筋肉は？", choices: ["脊柱起立筋", "内腹斜筋", "腹直筋", "腰方形筋"], answer: "脊柱起立筋", image: "thoracolumbar_rotation.png" },
-{ question: "頸部の「屈曲」において、貢献度1位の筋肉は？", choices: ["舌骨下筋群", "斜角筋群", "胸鎖乳突筋", "板状筋群"], answer: "斜角筋群", image: "cervical_flexion.png" },
-{ question: "頸部の「屈曲」において、貢献度2位の筋肉は？", choices: ["舌骨下筋群", "斜角筋群", "半棘筋群", "胸鎖乳突筋"], answer: "舌骨下筋群", image: "cervical_flexion.png" },
-{ question: "頸部の「伸展」において、貢献度1位の筋肉は？", choices: ["半棘筋群", "板状筋群", "胸鎖乳突筋", "斜角筋群"], answer: "板状筋群", image: "cervical_extension.png" },
-{ question: "頸部の「伸展」において、貢献度2位の筋肉は？", choices: ["半棘筋群", "板状筋群", "舌骨下筋群", "斜角筋群"], answer: "半棘筋群", image: "cervical_extension.png" },
-{ question: "頸部の「側屈」において、貢献度1位の筋肉は？", choices: ["斜角筋群", "胸鎖乳突筋", "板状筋群", "半棘筋群"], answer: "胸鎖乳突筋", image: "cervical_lateral.png" },
-{ question: "頸部の「側屈」において、貢献度2位の筋肉は？", choices: ["斜角筋群", "胸鎖乳突筋", "板状筋群", "半棘筋群"], answer: "斜角筋群", image: "cervical_lateral.png" },
-{ question: "頸部の「回旋」において、貢献度1位の筋肉は？", choices: ["板状筋群", "胸鎖乳突筋", "斜角筋群", "半棘筋群"], answer: "胸鎖乳突筋", image: "cervical_rotation.png" },
-{ question: "頸部の「回旋」において、貢献度2位の筋肉は？", choices: ["板状筋群", "胸鎖乳突筋", "斜角筋群", "舌骨下筋群"], answer: "板状筋群", image: "cervical_rotation.png" }
+{ question: "肩関節の「屈曲」において、貢献度1位の筋肉は？", answer: "三角筋(前部)", furigana: "さんかくきん (ぜんぶ)", image: "shoulder_flexion.png" },
+{ question: "肩関節の「屈曲」において、貢献度2位の筋肉は？", answer: "大胸筋(上部)", furigana: "だいきょうきん (じょうぶ)", image: "shoulder_flexion.png" },
+{ question: "肩関節の「伸展」において、貢献度1位の筋肉は？", answer: "広背筋", furigana: "こうはいきん", image: "shoulder_extension.png" },
+{ question: "肩関節の「伸展」において、貢献度2位の筋肉は？", answer: "大円筋", furigana: "だいえんきん", image: "shoulder_extension.png" },
+{ question: "肩関節の「外転」において、貢献度1位の筋肉は？", answer: "三角筋(中部)", furigana: "さんかくきん (ちゅうぶ)", image: "shoulder_abduction.png" },
+{ question: "肩関節の「外転」において、貢献度2位の筋肉は？", answer: "棘上筋", furigana: "きょくじょうきん", image: "shoulder_abduction.png" },
+{ question: "肩関節の「内転」において、貢献度1位の筋肉は？", answer: "広背筋", furigana: "こうはいきん", image: "shoulder_adduction.png" },
+{ question: "肩関節の「内転」において、貢献度2位の筋肉は？", answer: "大胸筋(下部)", furigana: "だいきょうきん (かぶ)", image: "shoulder_adduction.png" },
+{ question: "肩関節の「外旋」において、貢献度1位の筋肉は？", answer: "棘下筋", furigana: "きょくかきん", image: "shoulder_er.png" },
+{ question: "肩関節の「外旋」において、貢献度2位の筋肉は？", answer: "小円筋", furigana: "しょうえんきん", image: "shoulder_er.png" },
+{ question: "肩関節の「内旋」において、貢献度1位の筋肉は？", answer: "肩甲下筋", furigana: "けんこうかきん", image: "shoulder_ir.png" },
+{ question: "肩関節の「内旋」において、貢献度2位の筋肉は？", answer: "大胸筋", furigana: "だいきょうきん", image: "shoulder_ir.png" },
+{ question: "肩関節の「水平内転」において、貢献度1位の筋肉は？", answer: "大胸筋", furigana: "だいきょうきん", image: "shoulder_horizontal_adduction.png" },
+{ question: "肩関節の「水平内転」において、貢献度2位の筋肉は？", answer: "三角筋(前部)", furigana: "さんかくきん (ぜんぶ)", image: "shoulder_horizontal_adduction.png" },
+{ question: "肩関節の「水平外転」において、貢献度1位の筋肉は？", answer: "広背筋", furigana: "こうはいきん", image: "shoulder_horizontal_abduction.png" },
+{ question: "肩関節の「水平外転」において、貢献度2位の筋肉は？", answer: "三角筋(後部)", furigana: "さんかくきん (こうぶ)", image: "shoulder_horizontal_abduction.png" },
+{ question: "肩甲骨の「挙上」において、貢献度1位の筋肉は？", answer: "僧帽筋(上部)", furigana: "そうぼうきん (じょうぶ)", image: "scapula_elevation.png" },
+{ question: "肩甲骨の「挙上」において、貢献度2位の筋肉は？", answer: "肩甲挙筋", furigana: "けんこうきょきん", image: "scapula_elevation.png" },
+{ question: "肩甲骨の「下制」において、貢献度1位の筋肉は？", answer: "僧帽筋(下部)", furigana: "そうぼうきん (かぶ)", image: "scapula_depression.png" },
+{ question: "肩甲骨の「下制」において、貢献度2位の筋肉は？", answer: "小胸筋", furigana: "しょうきょうきん", image: "scapula_depression.png" },
+{ question: "肩甲骨の「内転」において、貢献度1位の筋肉は？", answer: "僧帽筋(中部)", furigana: "そうぼうきん (ちゅうぶ)", image: "scapula_adduction.png" },
+{ question: "肩甲骨の「内転」において、貢献度2位の筋肉は？", answer: "大菱形筋", furigana: "だいりょうけいきん", image: "scapula_adduction.png" },
+{ question: "肩甲骨の「外転」において、貢献度1位の筋肉は？", answer: "前鋸筋", furigana: "ぜんきょきん", image: "scapula_abduction.png" },
+{ question: "肩甲骨の「外転」において、貢献度2位の筋肉は？", answer: "小胸筋", furigana: "しょうきょうきん", image: "scapula_abduction.png" },
+{ question: "肩甲骨の「上方回旋」において、貢献度1位の筋肉は？", answer: "僧帽筋(上部)", furigana: "そうぼうきん (じょうぶ)", image: "scapula_upward_rotation.png" },
+{ question: "肩甲骨の「上方回旋」において、貢献度2位の筋肉は？", answer: "前鋸筋", furigana: "ぜんきょきん", image: "scapula_upward_rotation.png" },
+{ question: "肩甲骨の「下方回旋」において、貢献度1位の筋肉は？", answer: "大菱形筋", furigana: "だいりょうけいきん", image: "scapula_downward_rotation.png" },
+{ question: "肩甲骨の「下方回旋」において、貢献度2位の筋肉は？", answer: "小菱形筋", furigana: "しょうりょうけいきん", image: "scapula_downward_rotation.png" },
+{ question: "肘関節の「屈曲」において、貢献度1位の筋肉は？", answer: "上腕二頭筋", furigana: "じょうわんにとうきん", image: "elbow_flexion.png" },
+{ question: "肘関節の「屈曲」において、貢献度2位の筋肉は？", answer: "上腕筋", furigana: "じょうわんきん", image: "elbow_flexion.png" },
+{ question: "肘関節の「伸展」において、貢献度1位の筋肉は？", answer: "上腕三頭筋", furigana: "じょうわんさんとうきん", image: "elbow_extension.png" },
+{ question: "肘関節の「伸展」において、貢献度2位の筋肉は？", answer: "肘筋", furigana: "ちゅうきん", image: "elbow_extension.png" },
+{ question: "前腕の「回外」において、貢献度1位の筋肉は？", answer: "上腕二頭筋", furigana: "じょうわんにとうきん", image: "forearm_supination.png" },
+{ question: "前腕の「回外」において、貢献度2位の筋肉は？", answer: "回外筋", furigana: "かいがいきん", image: "forearm_supination.png" },
+{ question: "前腕の「回内」において、貢献度1位の筋肉は？", answer: "円回内筋", furigana: "えんかいないきん", image: "forearm_pronation.png" },
+{ question: "前腕の「回内」において、貢献度2位の筋肉は？", answer: "方形回内筋", furigana: "ほうけいかいないきん", image: "forearm_pronation.png" },
+{ question: "股関節の「屈曲」において、貢献度1位の筋肉は？", answer: "腸腰筋", furigana: "ちょうようきん", image: "hip_flexion.png" },
+{ question: "股関節の「屈曲」において、貢献度2位の筋肉は？", answer: "大腿直筋", furigana: "だいたいちょくきん", image: "hip_flexion.png" },
+{ question: "股関節の「伸展」において、貢献度1位の筋肉は？", answer: "大殿筋", furigana: "だいでんきん", image: "hip_extension.png" },
+{ question: "股関節の「伸展」において、貢献度2位の筋肉は？", answer: "ハムストリングス", furigana: "はむすとりんぐす", image: "hip_extension.png" },
+{ question: "股関節の「外転」において、貢献度1位の筋肉は？", answer: "中殿筋", furigana: "ちゅうでんきん", image: "hip_abduction.png" },
+{ question: "股関節の「外転」において、貢献度2位の筋肉は？", answer: "大殿筋(上部)", furigana: "だいでんきん (じょうぶ)", image: "hip_abduction.png" },
+{ question: "股関節の「内転」において、貢献度1位の筋肉は？", answer: "内転筋群", furigana: "ないてんきんぐん", image: "hip_adduction.png" },
+{ question: "股関節の「内転」において、貢献度2位の筋肉は？", answer: "大殿筋", furigana: "だいでんきん", image: "hip_adduction.png" },
+{ question: "股関節の「外旋」において、貢献度1位の筋肉は？", answer: "大殿筋", furigana: "だいでんきん", image: "hip_er.png" },
+{ question: "股関節の「外旋」において、貢献度2位の筋肉は？", answer: "大腿方形筋", furigana: "だいたいほうけいきん", image: "hip_er.png" },
+{ question: "股関節の「内旋」において、貢献度1位の筋肉は？", answer: "中殿筋(前部)", furigana: "ちゅうでんきん (ぜんぶ)", image: "hip_ir.png" },
+{ question: "股関節の「内旋」において、貢献度2位の筋肉は？", answer: "小殿筋(前部)", furigana: "しょうでんきん (ぜんぶ)", image: "hip_ir.png" },
+{ question: "膝関節の「屈曲」において、貢献度1位の筋肉は？", answer: "ハムストリングス", furigana: "はむすとりんぐす", image: "knee_flexion.png" },
+{ question: "膝関節の「屈曲」において、貢献度2位の筋肉は？", answer: "腓腹筋", furigana: "ひふくきん", image: "knee_flexion.png" },
+{ question: "膝関節の「伸展」において、貢献度1位の筋肉は？", answer: "大腿四頭筋", furigana: "だいたいしとうきん", image: "knee_extension.png" },
+{ question: "体幹の「屈曲」において、貢献度1位の筋肉は？", answer: "腹直筋", furigana: "ふくちょくきん", image: "thoracolumbar_flexion.png" },
+{ question: "体幹の「屈曲」において、貢献度2位の筋肉は？", answer: "外・内腹斜筋", furigana: "がい・ないふくしゃきん", image: "thoracolumbar_flexion.png" },
+{ question: "体幹の「伸展」において、貢献度1位の筋肉は？", answer: "脊柱起立筋", furigana: "せきちゅうきりつきん", image: "thoracolumbar_extension.png" },
+{ question: "体幹の「伸展」において、貢献度2位の筋肉は？", answer: "腰方形筋", furigana: "ようほうけいきん", image: "thoracolumbar_extension.png" },
+{ question: "体幹の「側屈」において、貢献度1位の筋肉は？", answer: "外・内腹斜筋", furigana: "がい・ないふくしゃきん", image: "thoracolumbar_lateral.png" },
+{ question: "体幹の「側屈」において、貢献度2位の筋肉は？", answer: "腰方形筋", furigana: "ようほうけいきん", image: "thoracolumbar_lateral.png" },
+{ question: "体幹の「回旋」において、貢献度1位の筋肉は？", answer: "内、外腹斜筋", furigana: "ない、がいふくしゃきん", image: "thoracolumbar_rotation.png" },
+{ question: "体幹の「回旋」において、貢献度2位の筋肉は？", answer: "脊柱起立筋", furigana: "せきちゅうきりつきん", image: "thoracolumbar_rotation.png" },
+{ question: "頸部の「屈曲」において、貢献度1位の筋肉は？", answer: "斜角筋群", furigana: "しゃかくきんぐん", image: "cervical_flexion.png" },
+{ question: "頸部の「屈曲」において、貢献度2位の筋肉は？", answer: "舌骨下筋群", furigana: "ぜっこつかきんぐん", image: "cervical_flexion.png" },
+{ question: "頸部の「伸展」において、貢献度1位の筋肉は？", answer: "板状筋群", furigana: "ばんじょうきんぐん", image: "cervical_extension.png" },
+{ question: "頸部の「伸展」において、貢献度2位の筋肉は？", answer: "半棘筋群", furigana: "はんきょくきんぐん", image: "cervical_extension.png" },
+{ question: "頸部の「側屈」において、貢献度1位の筋肉は？", answer: "胸鎖乳突筋", furigana: "きょうさにゅうとつきん", image: "cervical_lateral.png" },
+{ question: "頸部の「側屈」において、貢献度2位の筋肉は？", answer: "斜角筋群", furigana: "しゃかくきんぐん", image: "cervical_lateral.png" },
+{ question: "頸部の「回旋」において、貢献度1位の筋肉は？", answer: "胸鎖乳突筋", furigana: "きょうさにゅうとつきん", image: "cervical_rotation.png" },
+{ question: "頸部の「回旋」において、貢献度2位の筋肉は？", answer: "板状筋群", furigana: "ばんじょうきんぐん", image: "cervical_rotation.png" }
 ];
 
 let currentQuestionIndex = 0;
-let userAnswers = [];
-let isAnimating = false;
+let isShowingAnswer = false;
+
+document.getElementById("start-btn").addEventListener("click", function(e) {
+e.stopPropagation();
+document.getElementById("start-screen").style.display = "none";
+document.getElementById("quiz-screen").style.display = "flex";
+document.getElementById("logo-container").style.display = "block";
+currentQuestionIndex = 0;
+loadQuestion();
+});
+
+document.getElementById("reset-btn").addEventListener("click", function(e) {
+e.stopPropagation();
+document.getElementById("result-screen").style.display = "none";
+document.getElementById("start-screen").style.display = "flex";
+});
 
 let touchStartX = 0;
 let touchEndX = 0;
+let isSwiping = false;
 
-document.getElementById("start-btn").addEventListener("click", function() {
-document.getElementById("start-screen").style.display = "none";
-document.getElementById("quiz-screen").style.display = "block";
-document.getElementById("logo-container").style.display = "block";
-document.getElementById("muscle-img-wrapper").style.display = "block";
-currentQuestionIndex = 0;
-userAnswers = new Array(quizData.length).fill(null);
-isAnimating = false;
-loadQuestion();
+document.addEventListener("touchstart", function(e) {
+if (document.getElementById("quiz-screen").style.display !== "flex") return;
+touchStartX = e.changedTouches[0].screenX;
+isSwiping = false;
+}, {passive: true});
+
+document.addEventListener("touchend", function(e) {
+if (document.getElementById("quiz-screen").style.display !== "flex") return;
+touchEndX = e.changedTouches[0].screenX;
+const threshold = 50;
+
+if (touchEndX < touchStartX - threshold) {
+isSwiping = true;
+advanceState();
+} else if (touchEndX > touchStartX + threshold) {
+isSwiping = true;
+goBackState();
+}
+}, {passive: true});
+
+document.addEventListener("click", function(e) {
+if (document.getElementById("quiz-screen").style.display !== "flex") return;
+if (isSwiping) return;
+advanceState();
 });
 
-document.getElementById("prev-btn").addEventListener("click", function() {
-if (isAnimating || currentQuestionIndex === 0) return;
-currentQuestionIndex--;
-loadQuestion();
-});
-
-document.getElementById("next-btn").addEventListener("click", function() {
-if (isAnimating) return;
+function advanceState() {
+if (!isShowingAnswer) {
+showAnswer();
+} else {
 if (currentQuestionIndex < quizData.length - 1) {
 currentQuestionIndex++;
 loadQuestion();
 } else {
 showResult();
 }
-});
-
-document.getElementById("reset-btn").addEventListener("click", function() {
-document.getElementById("result-screen").style.display = "none";
-document.getElementById("start-screen").style.display = "block";
-isAnimating = false;
-});
-
-const quizContainer = document.getElementById("quiz-container");
-quizContainer.addEventListener("touchstart", function(e) {
-touchStartX = e.changedTouches[0].screenX;
-}, {passive: true});
-
-quizContainer.addEventListener("touchend", function(e) {
-touchEndX = e.changedTouches[0].screenX;
-handleSwipe();
-}, {passive: true});
-
-function handleSwipe() {
-const threshold = 50;
-if (touchEndX < touchStartX - threshold) {
-if (!isAnimating && currentQuestionIndex < quizData.length - 1) {
-document.getElementById("next-btn").click();
 }
 }
-if (touchEndX > touchStartX + threshold) {
-if (!isAnimating && currentQuestionIndex > 0) {
-document.getElementById("prev-btn").click();
-}
+
+function goBackState() {
+if (isShowingAnswer) {
+loadQuestion();
+} else if (currentQuestionIndex > 0) {
+currentQuestionIndex--;
+loadQuestion();
 }
 }
 
 function loadQuestion() {
+isShowingAnswer = false;
 const currentQuiz = quizData[currentQuestionIndex];
 document.getElementById("progress-text").textContent = (currentQuestionIndex + 1) + " / " + quizData.length + " 問目";
 document.getElementById("question-text").textContent = "Q" + (currentQuestionIndex + 1) + ". " + currentQuiz.question;
+
+document.getElementById("furigana-container").style.display = "none";
+document.getElementById("answer-container").style.display = "none";
+
 const muscleImg = document.getElementById("muscle-img");
 if (currentQuiz.image) {
 muscleImg.src = currentQuiz.image;
 muscleImg.style.display = "block";
+document.getElementById("muscle-img-wrapper").style.display = "block";
 } else {
-muscleImg.style.display = "none";
-}
-const choicesContainer = document.getElementById("choices-container");
-choicesContainer.innerHTML = "";
-currentQuiz.choices.forEach(function(choice) {
-const button = document.createElement("button");
-button.textContent = choice;
-button.className = "btn";
-if (userAnswers[currentQuestionIndex] === choice) {
-button.classList.add("selected");
-}
-button.addEventListener("click", function() { checkAnswer(choice); });
-choicesContainer.appendChild(button);
-});
-document.getElementById("prev-btn").disabled = (currentQuestionIndex === 0);
-if (currentQuestionIndex === quizData.length - 1) {
-document.getElementById("next-btn").textContent = "結果を見る";
-} else {
-document.getElementById("next-btn").textContent = "次の問題";
+document.getElementById("muscle-img-wrapper").style.display = "none";
 }
 }
 
-function checkAnswer(selectedChoice) {
-if (isAnimating) return;
-isAnimating = true;
-userAnswers[currentQuestionIndex] = selectedChoice;
+function showAnswer() {
+isShowingAnswer = true;
 const currentQuiz = quizData[currentQuestionIndex];
-const isCorrect = (selectedChoice === currentQuiz.answer);
-const popup = document.getElementById("popup");
-if (isCorrect) {
-popup.innerHTML = "<div class='correct-text'>○ 正解！</div>";
-} else {
-popup.innerHTML = "<div class='incorrect-text'>× 不正解...</div><span class='answer-text'>正解は「" + currentQuiz.answer + "」</span>";
+
+const furiganaContainer = document.getElementById("furigana-container");
+if (currentQuiz.furigana) {
+furiganaContainer.textContent = currentQuiz.furigana;
+furiganaContainer.style.display = "block";
 }
-popup.classList.add("show");
-loadQuestion();
-setTimeout(function() {
-popup.classList.remove("show");
-if (currentQuestionIndex < quizData.length - 1) {
-currentQuestionIndex++;
-loadQuestion();
-} else {
-showResult();
-}
-isAnimating = false;
-}, 1200);
+
+const answerContainer = document.getElementById("answer-container");
+answerContainer.textContent = currentQuiz.answer;
+answerContainer.style.display = "block";
 }
 
 function showResult() {
@@ -266,11 +253,6 @@ document.getElementById("quiz-screen").style.display = "none";
 document.getElementById("logo-container").style.display = "none";
 document.getElementById("muscle-img-wrapper").style.display = "none";
 document.getElementById("result-screen").style.display = "block";
-let score = 0;
-userAnswers.forEach(function(ans, index) {
-if (ans === quizData[index].answer) score++;
-});
-document.getElementById("result-text").textContent = quizData.length + "問中 " + score + " 問正解です！";
 }
 </script>
 
